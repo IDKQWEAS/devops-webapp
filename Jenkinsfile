@@ -1,29 +1,24 @@
 pipeline {
   agent any
   tools {
-    nodejs 'NodeJS_18'   // nama konfigurasi nodejs di Jenkins
+    nodejs 'node-uts'  // harus sama dengan nama yang kamu kasih di konfigurasi
   }
   stages {
-    stage('Install dependencies') {
+    stage('Check Node & npm') {
+      steps {
+        sh 'node -v'
+        sh 'npm -v'
+      }
+    }
+    stage('Install Dependencies') {
       steps {
         sh 'npm ci'
       }
     }
-  }
-}
-
-pipeline {
-    agent any
-    stages {
-        stage('Check Node and npm') {
-            steps {
-                sh 'node -v || echo "Node not found"'
-                sh 'npm -v || echo "npm not found"'
-                sh 'echo $PATH'
-                sh 'which node || echo "node not found in PATH"'
-                sh 'which npm || echo "npm not found in PATH"'
-            }
-        }
-        // stage lain ...
+    stage('Run Tests') {
+      steps {
+        sh 'npm test'
+      }
     }
+  }
 }
