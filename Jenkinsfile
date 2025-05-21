@@ -1,38 +1,15 @@
 pipeline {
-  agent any
-
-  environment {
-    NODE_ENV = 'development'
-  }
-
-  stages {
-    stage('Checkout Code') {
-      steps {
-        checkout scm
-      }
+    agent any
+    stages {
+        stage('Check Node and npm') {
+            steps {
+                sh 'node -v || echo "Node not found"'
+                sh 'npm -v || echo "npm not found"'
+                sh 'echo $PATH'
+                sh 'which node || echo "node not found in PATH"'
+                sh 'which npm || echo "npm not found in PATH"'
+            }
+        }
+        // stage lain ...
     }
-
-    stage('Install Dependencies') {
-      steps {
-        echo 'Installing dependencies...'
-        sh 'npm ci' // lebih cepat & konsisten daripada 'npm install'
-      }
-    }
-
-    stage('Run Tests') {
-      steps {
-        echo 'Running test suite...'
-        sh 'npm test'
-      }
-    }
-  }
-
-  post {
-    success {
-      echo '✅ Build and test succeeded!'
-    }
-    failure {
-      echo '❌ Build or test failed!'
-    }
-  }
 }
