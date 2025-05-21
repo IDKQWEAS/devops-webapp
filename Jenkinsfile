@@ -1,4 +1,18 @@
 pipeline {
+  agent any
+  tools {
+    nodejs 'NodeJS_18'   // nama konfigurasi nodejs di Jenkins
+  }
+  stages {
+    stage('Install dependencies') {
+      steps {
+        sh 'npm ci'
+      }
+    }
+  }
+}
+
+pipeline {
     agent any
     stages {
         stage('Check Node and npm') {
