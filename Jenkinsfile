@@ -39,20 +39,13 @@ pipeline {
                 // sh 'npm run build'
             }
         }
-        stage('Deploy') {
-          steps {
-            sshagent(['your-credentials-id']) {
-              sh 'scp -o StrictHostKeyChecking=no -i ~/.ssh/zidan ...'
-            }
-          }
-        }
 
         stage('Deploy') {
-            when {
-                expression { currentBuild.currentResult == 'SUCCESS' }
-            }
             steps {
                 sshagent([SSH_CREDENTIALS_ID]) {
+                    // Jika ada file yang perlu di-copy ke server, pakai scp di sini, contoh:
+                    // sh 'scp -o StrictHostKeyChecking=no path/to/file ${DEPLOY_USER}@${DEPLOY_HOST}:${APP_DIR}'
+
                     sh """
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} << 'ENDSSH'
                     if [ ! -d "${APP_DIR}" ]; then
@@ -70,7 +63,7 @@ pipeline {
                     fi
 
                     pm2 restart app.js || pm2 start app.js
-ENDSSH
+                    ENDSSH
                     """
                 }
             }
