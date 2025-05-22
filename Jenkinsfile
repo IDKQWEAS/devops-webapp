@@ -39,6 +39,13 @@ pipeline {
                 // sh 'npm run build'
             }
         }
+        stage('Deploy') {
+          steps {
+            sshagent(['your-credentials-id']) {
+              sh 'scp -o StrictHostKeyChecking=no -i ~/.ssh/zidan ...'
+            }
+          }
+        }
 
         stage('Deploy') {
             when {
