@@ -2,21 +2,13 @@ pipeline {
     agent any
 
     tools {
-        nodejs "Node18"  // Sesuaikan dengan nama NodeJS tool di Jenkins
-    }
-
-    environment {
-        DEPLOY_USER = "ec2-user"
-        DEPLOY_HOST = "3.0.19.184"  // Ganti dengan IP publik server Anda
-        SSH_CREDENTIALS_ID = "zidan_ssh"  // ID credential SSH di Jenkins
-        APP_DIR = "/home/ec2-user/app/uts-devopss"
-        GIT_REPO = "https://github.com/IDKQWEAS/devops-webapp.git"
+        nodejs 'Node18'  // Harus sama seperti yang dikonfigurasi di Jenkins
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'development', url: "${GIT_REPO}"
+                checkout scm
             }
         }
 
@@ -28,54 +20,17 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'npm test || echo "No tests defined"'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'node -v'
-                sh 'npm install'
-                // sh 'npm run build'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sshagent([SSH_CREDENTIALS_ID]) {
-                    // Jika ada file yang perlu di-copy ke server, pakai scp di sini, contoh:
-                    // sh 'scp -o StrictHostKeyChecking=no path/to/file ${DEPLOY_USER}@${DEPLOY_HOST}:${APP_DIR}'
-
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} << 'ENDSSH'
-                    if [ ! -d "${APP_DIR}" ]; then
-                        mkdir -p /home/ec2-user/app
-                        cd /home/ec2-user/app
-                        git clone ${GIT_REPO}
-                    fi
-
-                    cd ${APP_DIR}
-                    git pull origin development
-                    npm install
-
-                    if ! command -v pm2 &> /dev/null; then
-                        sudo npm install -g pm2
-                    fi
-
-                    pm2 restart app.js || pm2 start app.js
-                    ENDSSH
-                    """
-                }
+                sh 'npm test'
             }
         }
     }
 
     post {
         success {
-            echo "Pipeline finished successfully."
+            echo '✅ Build sukses'
         }
         failure {
-            echo "Pipeline failed. Check the logs."
+            echo '❌ Build gagal'
         }
     }
 }
