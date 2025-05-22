@@ -5,6 +5,14 @@ pipeline {
         nodejs "Node18"  // sesuaikan dengan nama NodeJS tool di Jenkins
     }
 
+    environment {
+        DEPLOY_USER = "ec2-user"
+        DEPLOY_HOST = "180.246.176.94"  // Ganti dengan IP instance AWS-mu
+        SSH_CREDENTIALS_ID = "zidan_ssh"  // ID credential SSH di Jenkins
+        APP_DIR = "/home/ec2-user/app/uts-devopss"
+        GIT_REPO = "https://github.com/IDKQWEAS/devops-webapp.git"
+    }
+
     stages {
         stage('Checkout') {
             steps {
