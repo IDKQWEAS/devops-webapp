@@ -8,9 +8,9 @@ pipeline {
     environment {
         DEPLOY_USER = "ec2-user"
         DEPLOY_HOST = "3.0.19.184"  // Ganti dengan IP instance AWS-mu
-        SSH_CREDENTIALS_ID = "ana_ssh"  // ID credential SSH di Jenkins
+        SSH_CREDENTIALS_ID = "zidan_ssh"  // ID credential SSH di Jenkins
         APP_DIR = "/home/ec2-user/app/uts-devopss"
-        GIT_REPO = "https://github.com/christianadeasyy/uts-devopss.git"
+        GIT_REPO = "https://github.com/IDKQWEAS/devops-webapp.git"
     }
 
     stages {
