@@ -2,22 +2,21 @@ pipeline {
     agent any
 
     tools {
-        nodejs "Node18"  // sesuaikan dengan nama NodeJS tool di Jenkins
+        nodejs "Node18"  // Sesuaikan dengan nama NodeJS tool di Jenkins
     }
 
     environment {
         DEPLOY_USER = "ec2-user"
-        DEPLOY_HOST = "180.246.176.94"  // Ganti dengan IP instance AWS-mu
+        DEPLOY_HOST = "3.0.19.184"  // Ganti dengan IP publik server Anda
         SSH_CREDENTIALS_ID = "zidan_ssh"  // ID credential SSH di Jenkins
         APP_DIR = "/home/ec2-user/app/uts-devopss"
         GIT_REPO = "https://github.com/IDKQWEAS/devops-webapp.git"
     }
 
-  
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'development', url: GIT_REPO
+                git branch: 'development', url: "${GIT_REPO}"
             }
         }
 
@@ -29,7 +28,6 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Kalau tidak ada test, ini supaya pipeline tetap lanjut
                 sh 'npm test || echo "No tests defined"'
             }
         }
@@ -49,8 +47,9 @@ pipeline {
             steps {
                 sshagent([SSH_CREDENTIALS_ID]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} << ENDSSH
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} << 'ENDSSH'
                     if [ ! -d "${APP_DIR}" ]; then
+                        mkdir -p /home/ec2-user/app
                         cd /home/ec2-user/app
                         git clone ${GIT_REPO}
                     fi
