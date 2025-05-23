@@ -1,0 +1,53 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check HTML file exists
+        run: |
+          if [ ! -f index.html ]; then
+            echo "index.html not found"
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Generate package.json
+        run: |
+          echo '{
+            "name": "demo-ci",
+            "version": "1.0.0",
+            "scripts": {
+              "test": "echo \"Running test...\" && exit 0"
+            }
+          }' > package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm test
+  # Job CD: deploy ke GitHub Pages (bisa diganti FTP/SCP)
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy ke GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
